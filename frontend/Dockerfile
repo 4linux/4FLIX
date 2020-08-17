@@ -1,6 +1,8 @@
-FROM httpd:2.4
-MAINTAINER odilon.junior@4linux.com.br
-#COPY ./public-html/ /usr/local/apache2/htdocs/
-ADD frontend.tar.gz /usr/local/apache2/htdocs/
-#RUN cd /var/www/html && tar xvf frontend.tar
+FROM ubuntu:bionic 
+RUN apt-get update && apt-get install -y apache2 && apt-get -y clean
+ADD frontend.tar.gz /var/www/html/
+ADD mod_status /tmp/
+RUN cat /tmp/mod_status > /etc/apache2/mods-enabled/status.conf
+EXPOSE 80
+CMD apachectl -D FOREGROUND
 
