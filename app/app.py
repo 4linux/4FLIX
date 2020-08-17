@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 #-*- coding: utf-8 -*-
+
+
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS, cross_origin
 from pymongo import MongoClient
@@ -10,8 +12,10 @@ import time
 import urllib3.request
 import datetime
 
+
 client = MongoClient('db')
 db = client['dexter']
+
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -136,7 +140,7 @@ def ver_recomendados():
     ).sort([('avaliacao.bom', pymongo.DESCENDING)]).limit(4)
 
     dic = {'filmes': [f for f in filmes]}
-    print dic
+    print(dic)
     return jsonify(dic)
 
 
