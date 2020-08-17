@@ -1,0 +1,6 @@
+FROM centos
+MAINTAINER odilon.junior@4linux.com.br
+RUN yum install httpd -y
+ADD frontend.tar.gz /var/www/html/
+#RUN cd /var/www/html && tar xvf frontend.tar
+CMD ["httpd", "-X"]

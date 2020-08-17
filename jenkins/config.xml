@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.7.0">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>https://github.com/Odilhao/continuous-monitoring-jmeter-</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>cd app
+docker build -t aliflix-python .
+cd ..
+cd frontend
+docker build -t aliflix-front .
+cd ..
+docker rm -f db || true
+docker run -tdi --name db -p27017:27017 mongo
+sleep 10
+ip_db=$(docker inspect db | grep -w &quot;IPAddress&quot; | awk &apos;{ print $2 }&apos; | head -n 1 | cut -d &quot;,&quot; -f1 | sed -e &apos;s/\&quot;//g&apos; )
+export NODE_ENV=$ip_db
+sed -i -e &apos;s/ip/&apos;&quot;$ip_db&quot;&apos;/g&apos; MongoScripts/aula4.js 
+mongo $ip_db:27017/dexter &lt; MongoScripts/aula4.js
+sed -i -e &apos;s/ip/&apos;&quot;$ip_db&quot;&apos;/g&apos; MongoScripts/hello.js
+mongo $ip_db:27017/dexter &lt; MongoScripts/hello.js 
+docker rm -f app || true
+docker run --name app --hostname app --link db -p5000:5000 -d aliflix-python
+docker rm -f front || true
+docker run -tdi --name=front --hostname front -p80:80 aliflix-front
+sleep 10
+ip_app=$(docker inspect app | grep -w &quot;IPAddress&quot; | awk &apos;{ print $2 }&apos; | head -n 1 | cut -d &quot;,&quot; -f1 | sed -e &apos;s/\&quot;//g&apos; )
+sed -i -E &apos;s/(stringProp name=&quot;HTTPSampler.domain&quot;&gt;)([a-zA-Z0-9&quot;-])+/\1&apos;&quot;$ip_app&quot;&apos;/g&apos; jenkins/aliflix.jmx
+bash /root/apache-jmeter-4.0/bin/jmeter -n -t jenkins/aliflix.jmx -l aliflix.jtl</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.plugins.performance.PerformancePublisher plugin="performance@3.5">
+      <errorFailedThreshold>0</errorFailedThreshold>
+      <errorUnstableThreshold>0</errorUnstableThreshold>
+      <errorUnstableResponseTimeThreshold></errorUnstableResponseTimeThreshold>
+      <relativeFailedThresholdPositive>0.0</relativeFailedThresholdPositive>
+      <relativeFailedThresholdNegative>0.0</relativeFailedThresholdNegative>
+      <relativeUnstableThresholdPositive>0.0</relativeUnstableThresholdPositive>
+      <relativeUnstableThresholdNegative>0.0</relativeUnstableThresholdNegative>
+      <nthBuildNumber>0</nthBuildNumber>
+      <configType>ART</configType>
+      <graphType>ART</graphType>
+      <modeOfThreshold>true</modeOfThreshold>
+      <failBuildIfNoResultFile>true</failBuildIfNoResultFile>
+      <compareBuildPrevious>false</compareBuildPrevious>
+      <optionType>ART</optionType>
+      <xml></xml>
+      <modePerformancePerTestCase>false</modePerformancePerTestCase>
+      <excludeResponseTime>false</excludeResponseTime>
+      <modeThroughput>false</modeThroughput>
+      <modeEvaluation>false</modeEvaluation>
+      <constraints class="empty-list"/>
+      <ignoreFailedBuilds>true</ignoreFailedBuilds>
+      <ignoreUnstableBuilds>true</ignoreUnstableBuilds>
+      <persistConstraintLog>false</persistConstraintLog>
+      <sourceDataFiles>aliflix.jtl</sourceDataFiles>
+      <junitOutput></junitOutput>
+      <percentiles>0,50,90,100</percentiles>
+    </hudson.plugins.performance.PerformancePublisher>
+  </publishers>
+  <buildWrappers/>
+</project>

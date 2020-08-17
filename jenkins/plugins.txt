@@ -1,0 +1,3 @@
+postbuildscript:2.5.0
+performance:3.5
+job-import-plugin:2.0
