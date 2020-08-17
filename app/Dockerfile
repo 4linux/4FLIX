@@ -1,7 +1,11 @@
-FROM ubuntu:bionic 
-RUN apt-get update && apt-get install -y apache2 && apt-get -y clean
-ADD frontend.tar.gz /var/www/html/
-ADD mod_status /tmp/
-RUN cat /tmp/mod_status > /etc/apache2/mods-enabled/status.conf
-EXPOSE 80
-CMD apachectl -D FOREGROUND
+FROM centos
+MAINTAINER odilon.junior@4linux.com.br
+RUN yum install wget gcc openssl-devel cairo cairo-devel cairomm-devel  python-devel libxslt-devel libffi-devel gcc-c++ kernel-devel python-gobject gobject-introspection-devel cairo-gobject cairo-gobject-devel epel-release -y 
+RUN yum install python-pip -y
+COPY Requirements.txt /srv/
+RUN cd /srv/ && pip2.7 install -r Requirements.txt
+RUN yum remove gcc kernel-devel gcc-c++ -y
+RUN yum clean all
+RUN rm -rf /var/cache/yum
+COPY app.py /srv/
+CMD ["python2.7", "/srv/app.py"]

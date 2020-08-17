@@ -1,9 +1,0 @@
-<IfModule mod_status.c>
-    <Location /server-status>
-        SetHandler server-status
-        Order allow,deny
-        Allow from all
-    </Location>
-    ExtendedStatus On
-</IfModule>
-
