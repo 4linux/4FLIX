@@ -6,5 +6,5 @@ COPY plugins.txt /usr/share/jenkins/ref/
 RUN /usr/local/bin/plugins.sh /usr/share/jenkins/ref/plugins.txt
 COPY aliflix.jmx /var/jenkins_home/
 USER root
-RUN wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-4.0.zip
-RUN cd /root && tar xvfz apache-jmeter-4.0.tgz
+RUN wget http://ftp.unicamp.br/pub/apache//jmeter/binaries/apache-jmeter-4.0.zip
+RUN cd /root && unzip apache-jmeter-4.0.zip
