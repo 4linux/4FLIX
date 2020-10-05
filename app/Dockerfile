@@ -4,7 +4,7 @@ RUN yum install wget gcc openssl-devel cairo cairo-devel cairomm-devel  python-d
 RUN yum install python-pip -y
 #RUN pip install --upgrade pip
 COPY Requirements.txt /srv/
-RUN cd /srv/ && pip2.7 install -r Requirements.txt
+RUN cd /srv/ && pip2.7 install -r requirements.txt
 RUN yum remove gcc kernel-devel gcc-c++ -y
 RUN yum clean all
 RUN rm -rf /var/cache/yum
