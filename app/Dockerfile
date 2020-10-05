@@ -1,4 +1,4 @@
-FROM centos
+FROM centos:7
 MAINTAINER odilon.junior@4linux.com.br
 RUN yum install wget gcc openssl-devel cairo cairo-devel cairomm-devel  python-devel libxslt-devel libffi-devel gcc-c++ kernel-devel python-gobject gobject-introspection-devel cairo-gobject cairo-gobject-devel epel-release -y 
 RUN yum install python-pip -y
